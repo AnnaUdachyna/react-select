@@ -391,9 +391,9 @@ export default class Select extends Component<Props, State> {
     this.cacheComponents(nextProps.components);
     // rebuild the menu options
     if (
-      nextProps.value !== value ||
-      nextProps.options !== options ||
-      nextProps.inputValue !== inputValue
+      JSON.stringify(nextProps.value) !== JSON.stringify(value) ||
+      JSON.stringify(nextProps.options) !== JSON.stringify(options) ||
+      JSON.stringify(nextProps.inputValue) !== JSON.stringify(inputValue)
     ) {
       const selectValue = cleanValue(nextProps.value);
       const menuOptions = this.buildMenuOptions(nextProps, selectValue);
@@ -477,6 +477,19 @@ export default class Select extends Component<Props, State> {
   focus = this.focusInput;
   blur = this.blurInput;
 
+  findIndex(array, cb, fromIndex, fromRight) {
+    fromIndex = fromIndex ? fromIndex : 0;
+    const { length } = array;
+    let index = fromIndex + (fromRight ? 1 : -1);
+
+    while ((fromRight ? index-- : ++index < length)) {
+      if (cb(array[index], index, array)) {
+        return index;
+      }
+    }
+    return -1;
+  }
+
   openMenu(focusOption: 'first' | 'last') {
     const { menuOptions, selectValue } = this.state;
     const { isMulti } = this.props;
@@ -484,7 +497,7 @@ export default class Select extends Component<Props, State> {
       focusOption === 'first' ? 0 : menuOptions.focusable.length - 1;
 
     if (!isMulti) {
-      const selectedIndex = menuOptions.focusable.indexOf(selectValue[0]);
+      const selectedIndex = this.findIndex(menuOptions.focusable, focusableOption => { return JSON.stringify(selectValue[0]) === JSON.stringify(focusableOption); });
       if (selectedIndex > -1) {
         openAtIndex = selectedIndex;
       }
@@ -730,9 +743,9 @@ export default class Select extends Component<Props, State> {
       return null;
     }
     const { focusedValue, selectValue: lastSelectValue } = this.state;
-    const lastFocusedIndex = lastSelectValue.indexOf(focusedValue);
+    const lastFocusedIndex = this.findIndex(lastSelectValue, lastSelectedValueItem => { return JSON.stringify(focusedValue) === JSON.stringify(lastSelectedValueItem); });
     if (lastFocusedIndex > -1) {
-      const nextFocusedIndex = nextSelectValue.indexOf(focusedValue);
+      const nextFocusedIndex = this.findIndex(nextSelectValue, nextSelectedValueItem => { return JSON.stringify(focusedValue) === JSON.stringify(nextSelectedValueItem); });
       if (nextFocusedIndex > -1) {
         // the focused value is still in the selectValue, return it
         return focusedValue;
@@ -747,7 +760,7 @@ export default class Select extends Component<Props, State> {
 
   getNextFocusedOption(options: OptionsType) {
     const { focusedOption: lastFocusedOption } = this.state;
-    return lastFocusedOption && options.indexOf(lastFocusedOption) > -1
+    return lastFocusedOption && this.findIndex(options, option => { return JSON.stringify(option) === JSON.stringify(lastFocusedOption); }) > -1
       ? lastFocusedOption
       : options[0];
   }

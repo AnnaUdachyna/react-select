@@ -1,5 +1,5 @@
 {
-  "name": "react-select",
+  "name": "react-select-contrib-aud",
   "version": "2.1.1",
   "description": "A Select control built with and for ReactJS",
   "main": "lib/index.js",
@@ -9,7 +9,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/JedWatson/react-select.git"
+    "url": "https://github.com/AnnaUdacyna/react-select.git"
   },
   "dependencies": {
     "classnames": "^2.2.5",
